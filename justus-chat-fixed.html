@@ -464,12 +464,11 @@ const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-    { urls: 'stun:stun.cloudflare.com:3478' },
-    { urls: 'turn:global.relay.metered.ca:80',               username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:global.relay.metered.ca:443',              username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turns:global.relay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:numb.viagenie.ca', username: 'webrtc@live.com', credential: 'muazkh' }
+    { urls: 'stun:stun.relay.metered.ca:80' },
+    { urls: 'turn:global.relay.metered.ca:80',               username: '6187561f706244eee9d93e7e', credential: 'WdlCmkhWebwX498J' },
+    { urls: 'turn:global.relay.metered.ca:80?transport=tcp', username: '6187561f706244eee9d93e7e', credential: 'WdlCmkhWebwX498J' },
+    { urls: 'turn:global.relay.metered.ca:443',              username: '6187561f706244eee9d93e7e', credential: 'WdlCmkhWebwX498J' },
+    { urls: 'turns:global.relay.metered.ca:443?transport=tcp', username: '6187561f706244eee9d93e7e', credential: 'WdlCmkhWebwX498J' }
   ],
   bundlePolicy: 'max-bundle',
   rtcpMuxPolicy: 'require'
@@ -868,15 +867,12 @@ function makePeerConnection(peerId, peerName){
     const isScreenTrack = (track.id === state._screenTrackId);
 
     if(!state.isHost && isScreenTrack){
-      // Show on the big screen for guests
       const sv = document.getElementById('shared-screen');
       sv.srcObject = stream;
       sv.style.display='block';
       document.getElementById('no-share-msg').style.display='none';
-      return; // don't put screen share in camera tile
+      return;
     }
-
-    // Camera/audio — merge track into peer's stream
     if(state.peerStreams[peerId]){
       if(!state.peerStreams[peerId].getTrackById(track.id)){
         state.peerStreams[peerId].addTrack(track);
@@ -884,7 +880,6 @@ function makePeerConnection(peerId, peerName){
     } else {
       state.peerStreams[peerId] = stream;
     }
-    // Update tile once with fully accumulated stream
     updatePeerTile(peerId, state.peerStreams[peerId]);
   };
 
@@ -991,12 +986,10 @@ function renderSelfTile(){
 }
 
 function addPeerEntry(peerId, peerName){
-  // Always update name mapping
   if(!state.peerNames[peerId]) state.peerNames[peerId] = peerName;
   if(!state.peerColors[peerId]) state.peerColors[peerId] = randColor();
   const color = state.peerColors[peerId];
   const tiles = document.getElementById('video-tiles');
-  // Only create tile if it doesn't exist yet
   if(document.getElementById('tile-'+peerId)) return;
   const tile=document.createElement('div');
   tile.className='video-tile'; tile.id='tile-'+peerId;
@@ -1018,6 +1011,7 @@ function updatePeerTile(peerId, stream){
   if(hasVid){
     const vid=document.createElement('video');
     vid.autoplay=true; vid.playsInline=true; vid.srcObject=stream;
+    // Force play (some browsers block autoplay without user gesture)
     tile.appendChild(vid);
     vid.play().catch(()=>{});
   } else {
