@@ -894,7 +894,7 @@ function makePeerConnection(peerId, peerName){
     const info = document.createElement('div');
     info.className = 'tile-info';
     const role = state.isHost ? 'Guest' : 'Host';
-    info.innerHTML = \`<div class="tile-name">\${state.peerNames[pid]||'Guest'}</div><div class="tile-badge \${state.isHost?'guest':'host'}">\${role}</div>\`;
+    info.innerHTML = `<div class="tile-name">${state.peerNames[pid]||'Guest'}</div><div class="tile-badge ${state.isHost?'guest':'host'}">${role}</div>`;
     tile.appendChild(info);
     console.log('[WebRTC] tile updated for', state.peerNames[pid]||pid);
   };
